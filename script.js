@@ -1,16 +1,17 @@
 let isMouseDown = false;
 let lastX = 0;
 let lastY = 0;
-let currentSpeed = 0.01; // Initial rotation speed
+let currentSpeed = 0.01; // Rotation speed
 
 const cube = document.querySelector('.cube');
 
-// Function to handle mouse and touch events for rotation
+// This function will handle both mouse and touch events for rotating the cube
 function onMove(e) {
     if (!isMouseDown) return;
 
-    const x = e.clientX || e.touches[0].clientX; // For touch event support
-    const y = e.clientY || e.touches[0].clientY; // For touch event support
+    // For touch events
+    const x = e.clientX || e.touches[0].clientX;
+    const y = e.clientY || e.touches[0].clientY;
 
     const deltaX = x - lastX;
     const deltaY = y - lastY;
@@ -24,28 +25,29 @@ function onMove(e) {
     lastY = y;
 }
 
-// Start rotating on mouse/touch down
+// Function to start rotation on mouse/touch down
 function onStart(e) {
     isMouseDown = true;
-    lastX = e.clientX || e.touches[0].clientX; // Get the touch or mouse position
+    lastX = e.clientX || e.touches[0].clientX;
     lastY = e.clientY || e.touches[0].clientY;
 }
 
-// End rotating when mouse/touch is released
+// Function to stop rotation on mouse/touch up
 function onEnd() {
     isMouseDown = false;
 }
 
-// Add event listeners for both mouse and touch events
+// Mouse events
 document.addEventListener('mousedown', onStart);
 document.addEventListener('mousemove', onMove);
 document.addEventListener('mouseup', onEnd);
 
+// Touch events
 document.addEventListener('touchstart', onStart);
 document.addEventListener('touchmove', onMove);
 document.addEventListener('touchend', onEnd);
 
-// Optionally, add a speed control button for mobile as well
+// Speed control buttons
 document.getElementById('increaseSpeed').addEventListener('click', () => {
     currentSpeed += 0.01; // Increase rotation speed
 });
