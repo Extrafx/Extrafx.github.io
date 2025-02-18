@@ -48,10 +48,4 @@ document.addEventListener('touchmove', onMove);
 document.addEventListener('touchend', onEnd);
 
 // Speed control buttons
-document.getElementById('increaseSpeed').addEventListener('click', () => {
-    currentSpeed += 0.01; // Increase rotation speed
-});
-
-document.getElementById('decreaseSpeed').addEventListener('click', () => {
-    currentSpeed = Math.max(0.01, currentSpeed - 0.01); // Decrease rotation speed
-});
+document.getElementById('i
