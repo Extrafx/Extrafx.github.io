@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Metallic Cube</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(45deg, #1c1c1c, #333);
+            overflow: hidden;
+        }
+
+        .cube-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            perspective: 1200px;
+        }
+
+        .cube {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+
+        /* Faces of the Cube with Metallic Gradient */
+        .cube .face {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, #8e8e8e, #a1a1a1);
+            border: 1px solid #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: #fff;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .cube .front  { transform: translateZ(100px); }
+        .cube .back   { transform: rotateY(180deg) translateZ(100px); }
+        .cube .left   { transform: rotateY(-90deg) translateZ(100px); }
+        .cube .right  { transform: rotateY(90deg) translateZ(100px); }
+        .cube .top    { transform: rotateX(90deg) translateZ(100px); }
+        .cube .bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            font-family: Arial, sans-serif;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 300px;
+        }
+
+        .speed-slider {
+            width: 150px;
+        }
+
+        .speed-label {
+            margin-left: 10px;
+        }
+
+        /* Styling for the sliders */
+        .speed-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .speed-slider:hover {
+            background: #999;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            background: #45a049;
+        }
+
+        .speed-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .speed-slider::-moz-range-thumb:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cube-container">
+    <div class="cube">
+        <div class="face front"></div>
+        <div class="face back"></div>
+        <div class="face left"></div>
+        <div class="face right"></div>
+        <div class="face top"></div>
+        <div class="face bottom"></div>
+    </div>
+</div>
+
+<div class="controls">
+    <div>
+        <label for="drag-speed">Drag Speed:</label>
+        <input type="range" id="drag-speed" class="speed-slider" min="1" max="20" value="5">
+        <span id="drag-speed-value" class="speed-label">5</span>
+    </div>
+    <div>
+        <label for="auto-rotate-speed">Auto-Rotate Speed:</label>
+        <input type="range" id="auto-rotate-speed" class="speed-slider" min="1" max="20" value="5">
+        <span id="auto-rotate-value" class="speed-label">5</span>
+    </div>
+</div>
+
+<script>
+    const dragSpeedSlider = document.getElementById('drag-speed');
+    const autoRotateSpeedSlider = document.getElementById('auto-rotate-speed');
+    const dragSpeedValue = document.getElementById('drag-speed-value');
+    const autoRotateValue = document.getElementById('auto-rotate-value');
+    const cube = document.querySelector('.cube');
+
+    let isMouseDown = false;
+    let startX, startY;
+    let rotateX = 0, rotateY = 0; // Current rotation angles
+    let autoRotateSpeed = 0.5; // Speed of auto-rotation when the mouse is idle
+    let dragSpeed = 0.5; // Speed of rotation when dragging with the mouse
+    let lastMoveTime = Date.now();
+
+    // Rotate cube based on cursor movement
+    document.body.addEventListener('mousedown', (e) => {
+        isMouseDown = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        lastMoveTime = Date.now(); // Reset timer
+    });
+
+    document.body.addEventListener('mousemove', (e) => {
+        if (!isMouseDown) return;
+        let deltaX = e.clientX - startX;
+        let deltaY = e.clientY - startY;
+
+        // Adjust rotation speed based on dragSpeed value
+        rotateY += deltaX * dragSpeed; // Move left/right controls Y rotation
+        rotateX -= deltaY * dragSpeed; // Move up/down controls X rotation
+
+        cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+        startX = e.clientX; // Update the starting point for next move
+        startY = e.clientY;
+
+        // Update last move time
+        lastMoveTime = Date.now();
+    });
+
+    document.body.addEventListener('mouseup', () => {
+        isMouseDown = false;
+    });
+
+    // Update speed values for drag speed and auto-rotate speed
+    dragSpeedSlider.addEventListener('input', function() {
+        dragSpeed = dragSpeedSlider.value / 10; // Adjust the drag rotation speed
+        dragSpeedValue.textContent = dragSpeedSlider.value;
+    });
+
+    autoRotateSpeedSlider.addEventListener('input', function() {
+        autoRotateSpeed = autoRotateSpeedSlider.value / 10; // Adjust the auto-rotation speed
+        autoRotateValue.textContent = autoRotateSpeedSlider.value;
+    });
+
+    // Auto-rotate cube when mouse is idle
+    function autoRotate() {
+        const now = Date.now();
+        const idleTime = now - lastMoveTime;
+
+        if (idleTime > 100) {
+            // Only rotate when the mouse has been idle for a while
+            rotateX += autoRotateSpeed;
+            rotateY += autoRotateSpeed;
+            cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+
+        requestAnimationFrame(autoRotate);
+    }
+
+    // Start the auto-rotation function
+    autoRotate();
+
+</script>
+
+</body>
+</html>
